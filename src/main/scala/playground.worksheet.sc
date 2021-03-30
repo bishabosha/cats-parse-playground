@@ -28,17 +28,17 @@ def nl = P.char('\n')
 
 def word = P.charsWhile(('a' to 'z').contains)
 
-def nat = Numbers.nonZeroDigit ~ Numbers.digits0 map ((s, r) => s"$s$r".toInt)
+def nat = Numbers.nonZeroDigit ~ Numbers.digits0 map ((d, ds) => (d +: ds).toInt)
 
 def one = P.char('1') as 1
 
-def material = (word <* sp) ~ (word <* sp) map Material.apply
+def material = (word <* sp) ~ word map Material.apply
 
 def noBags = P.string("no other bags") as List.empty
 
-def oneBag = (one <* sp) ~ material <* P.string("bag")
+def oneBag = (one <* sp) ~ material <* P.string(" bag")
 
-def multiBag = (nat <* sp) ~ material <* P.string("bags")
+def multiBag = (nat <* sp) ~ material <* P.string(" bags")
 
 def natBag = P.oneOf(List(oneBag, multiBag))
 
@@ -46,7 +46,7 @@ def natBags = (natBag repSep P.string(", "))
 
 def nestedBags = P.oneOf(List(noBags, natBags.map(_.toList))) <* P.char('.')
 
-def bag = (material <* P.string("bags contain ")) ~ nestedBags map Bag.apply
+def bag = (material <* P.string(" bags contain ")) ~ nestedBags map Bag.apply
 
 def bags = (bag repSep nl) <* P.end
 
